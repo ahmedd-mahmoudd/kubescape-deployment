@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: kubescape-analysis
+  labels:
+    app: nginx
+spec:
+  metrics:
+    - name: kubescape-scan
+      successCondition: result > 0
+      provider:
+        job:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: kubescape
+                    image: kubescape/kubescape:latest
+                    command:
+                      - /kubescape
+                      - scan
+                      - framework
+                      - all
+                      - --fail-threshold
+                      - "high"
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 250m
+                        memory: 128Mi
+                restartPolicy: Never
